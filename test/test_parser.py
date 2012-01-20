@@ -17,24 +17,15 @@
 #
 ########################################################################
 
-from socpy.foundation import SimulationObjectMember
+from socpy.parser import *
 
-class InstructionBehavior(SimulationObjectMember):
-    def __init__(self, inst_format, inst_reg, matching):
-        self.__instruction_format__ = inst_format
-        self.__instruction_register__ = inst_reg
-        self.__matching__ = matching
+def test_mnemonic():
+    @mnemonic("test_function a, b")
+    def test_function(a, b):
+        return a+b
 
-    def __call__(self, *args, **kwargs):
-        return self.behavior(*args, **kwargs)
-        
-def instruction(instruction_format, instruction_register, **kwargs):
-    def create_wrapped(func):
-        wrapped = InstructionBehavior(
-            instruction_format,
-            instruction_register,
-            kwargs)
-        wrapped.behavior = func
-        return wrapped
-    return create_wrapped
+    # the original functionality of the decorated function shouldn't change
+    assert test_function(3, 5) == 8
+
+    assert test_function.__mnemonic__ == "test_function a, b"
 

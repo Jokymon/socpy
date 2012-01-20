@@ -19,7 +19,8 @@
 
 from socpy.foundation import SimulationObjectMember
 from socpy.types import Unsigned, InstFormat
-from socpy.processor import instruction, mnemonic
+from socpy.processor import instruction
+from socpy.parser import mnemonic
 from socpy.hardware import Processor, Memory, RegisterBank, Register, InstructionPointer
 
 class Mips(Processor):

@@ -39,16 +39,6 @@ def test_instruction():
     assert test_function.__matching__["field1"] == 1
     assert test_function.__matching__["field2"] == 2
 
-def test_mnemonic():
-    @mnemonic("test_function a, b")
-    def test_function(a, b):
-        return a+b
-
-    # the original functionality of the decorated function shouldn't change
-    assert test_function(3, 5) == 8
-
-    assert test_function.__mnemonic__ == "test_function a, b"
-
 def test_instruction_is_named():
     simulation_object = ClassForTestingNamedInstructions()
     assert simulation_object.an_instruction.name == "an_instruction"

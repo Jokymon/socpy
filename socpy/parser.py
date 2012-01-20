@@ -17,24 +17,10 @@
 #
 ########################################################################
 
-from socpy.foundation import SimulationObjectMember
+def mnemonic(parsing_string):
+    def internal(func):
+        func.__mnemonic__ = parsing_string
+        return func
+    return internal
 
-class InstructionBehavior(SimulationObjectMember):
-    def __init__(self, inst_format, inst_reg, matching):
-        self.__instruction_format__ = inst_format
-        self.__instruction_register__ = inst_reg
-        self.__matching__ = matching
-
-    def __call__(self, *args, **kwargs):
-        return self.behavior(*args, **kwargs)
-        
-def instruction(instruction_format, instruction_register, **kwargs):
-    def create_wrapped(func):
-        wrapped = InstructionBehavior(
-            instruction_format,
-            instruction_register,
-            kwargs)
-        wrapped.behavior = func
-        return wrapped
-    return create_wrapped
 
