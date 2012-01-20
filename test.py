@@ -19,6 +19,7 @@
 
 import os, os.path, sys
 import unittest
+from optparse import OptionParser
 
 # import all modules in the test directory
 modules = os.listdir("test")
@@ -44,5 +45,10 @@ for name in filter(lambda x: not x.startswith("__"),
 all_tests = unittest.TestSuite( 
                 map(unittest.FunctionTestCase, test_cases)
             )
-unittest.TextTestRunner().run(all_tests)
+
+parser = OptionParser()
+parser.add_option("-v", dest="verbosity", default=0, type="int", 
+                  help="verbosity level for tests")
+(options, args) = parser.parse_args()
+unittest.TextTestRunner(verbosity=options.verbosity).run(all_tests)
 
