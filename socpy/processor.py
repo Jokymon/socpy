@@ -18,9 +18,12 @@
 ########################################################################
 
 from socpy.foundation import SimulationObjectMember
+import textwrap
+import inspect, ast
 
 class InstructionBehavior(SimulationObjectMember):
-    def __init__(self, inst_format, inst_reg, matching):
+    def __init__(self, function_ast, inst_format, inst_reg, matching):
+        self.__function_ast__ = function_ast
         self.__instruction_format__ = inst_format
         self.__instruction_register__ = inst_reg
         self.__matching__ = matching
@@ -30,7 +33,10 @@ class InstructionBehavior(SimulationObjectMember):
         
 def instruction(instruction_format, instruction_register, **kwargs):
     def create_wrapped(func):
+        source = inspect.getsource(func)
+        source = textwrap.dedent( source )
         wrapped = InstructionBehavior(
+            ast.parse( source ),
             instruction_format,
             instruction_register,
             kwargs)
