@@ -22,24 +22,49 @@ import textwrap
 import inspect, ast
 
 class InstructionBehavior(SimulationObjectMember):
-    def __init__(self, function_ast, inst_format, inst_reg, matching):
+    def __init__(self, function_ast, inst_format, inst_reg, matching, wrappee):
         self.__function_ast__ = function_ast
         self.__instruction_format__ = inst_format
         self.__instruction_register__ = inst_reg
         self.__matching__ = matching
+        self.behavior = wrappee
+        self.owner = None
 
     def __call__(self, *args, **kwargs):
-        return self.behavior(*args, **kwargs)
+        if self.owner:
+            return self.behavior(self.owner, *args, **kwargs)
+        else:
+            return self.behavior(*args, **kwargs)
+
+class InstructionMember(SimulationObjectMember):
+    def __init__(self, function_ast, inst_format, inst_reg, matching, wrappee):
+        self.instance = InstructionBehavior(function_ast, inst_format, inst_reg, matching, wrappee)
+
+    def __get__(self, obj, objtype):
+        self.instance.owner = obj
+        return self.instance
+
+    def __call__(self, *args, **kwargs):
+        return self.instance(*args, **kwargs)
+
+    def __setattr__(self, key, value):
+        if key!="instance":
+            SimulationObjectMember.__setattr__(self.instance, key, value)
+        SimulationObjectMember.__setattr__(self, key, value)
+
+    def __getattr__(self, key):
+        return getattr(self.instance, key)
         
 def instruction(instruction_format, instruction_register, **kwargs):
     def create_wrapped(func):
         source = inspect.getsource(func)
         source = textwrap.dedent( source )
-        wrapped = InstructionBehavior(
+        wrapped = InstructionMember(
             ast.parse( source ),
             instruction_format,
             instruction_register,
-            kwargs)
+            kwargs,
+            func)
         wrapped.behavior = func
         return wrapped
     return create_wrapped

@@ -23,8 +23,8 @@ from socpy.foundation import SimulationObject
 class ClassForTestingNamedInstructions(metaclass = SimulationObject):
     
     @instruction("instruction format", "instruction register", field1=1, field2=2)
-    def an_instruction(self):
-        pass
+    def an_instruction(self, parameter):
+        return parameter
 
 def test_instruction():
     @instruction("Instruction format", "Instruction register", field1=1, field2=2)
@@ -42,3 +42,8 @@ def test_instruction():
 def test_instruction_is_named():
     simulation_object = ClassForTestingNamedInstructions()
     assert simulation_object.an_instruction.name == "an_instruction"
+
+def test_parameter_handling():
+    """Making sure that member functions are properly wrapped with correct handling of self"""
+    simulation_object = ClassForTestingNamedInstructions()
+    assert simulation_object.an_instruction(42) == 42
